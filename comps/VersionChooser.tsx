@@ -1,15 +1,15 @@
 import { SelectBox, SelectBoxItem } from "@tremor/react";
-import { DevicePhoneMobileIcon } from "@heroicons/react/24/outline"
+import { VersionChooserType, VersionType } from "../interfaces";
 
-export default function VersionChooser({ data, appConf, handleSelect }) {
-  const versions =  data.data[appConf.platform].map(p => p.version);
-  const defaultVersion =  appConf.version ? appConf.version : versions[0];
+export default function VersionChooser({ data, appConf, handleSelect }: VersionChooserType) {
+  const versions = (data.data as any)[appConf.platform].map((p: VersionType): string => p.version) as Array<string>
+  const defaultVersion = appConf.version ? appConf.version : versions[0];
   return (
     <SelectBox
       key={appConf.platform}
       handleSelect={handleSelect}
       defaultValue={defaultVersion}
-      maxWidth="max-w-xs"    
+      maxWidth="max-w-xs"
     >
       {versions.map(v =>
         (<SelectBoxItem key={v} value={v} text={v} />)

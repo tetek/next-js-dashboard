@@ -20,50 +20,57 @@ import { Icon } from "@tremor/react";
 import { FaApple, FaAndroid } from "react-icons/fa"
 import { version } from 'os';
 import Reaper from '../comps/Reaper';
-import Insights from '../comps/Insights';
+import InsightsCard from '../comps/InsightsCard';
 import { compareVersions } from 'compare-versions';
+import { HomeType, PerfType, VersionType, AppConfType } from '../interfaces';
 
-export default function Home({ data }) {
-  const [appConf, setAppConf] = useState({app: '1Password', platform: 'apple', version: '7.2.0', platformVersion: "iOS15"})
+const Home = ({ data }: HomeType) => {
+  console.log('ddddd')
+  console.log(data)
+  const [appConf, setAppConf]: [AppConfType, any] = useState({ app: '1Password', platform: 'apple', version: '7.2.0', platformVersion: "iOS15" })
   console.log(data.insights)
-  const size = data.data[appConf.platform].find(i => i.version == appConf.version).size
+  const platformData = (platform: string): Array<VersionType> => (data.data as any)[platform]
 
-  function changeApp(newApp) {
-    const defaultAppVersion = data.data[appConf.platform].map(p => p.version )[0] ?? "no version"
-    setAppConf(oldAppConf => ({
+
+  const e = platformData(null!!)
+  const size = platformData(appConf.platform)?.find((i: VersionType) => i.version == appConf.version)?.size
+
+  function changeApp(newApp: string) {
+    const defaultAppVersion = platformData(appConf.platform).map((p: VersionType) => p.version)[0] ?? "no version"
+    setAppConf((oldAppConf: AppConfType) => ({
       ...oldAppConf,
       app: newApp,
       version: defaultAppVersion
     }));
   }
-  function getDefaultOSVersion(platform = appConf.platform, version= appConf.version) {
-    const perAppVersion = data.data[platform].filter(e => e.version == version)[0]
-    const osVersions = [...new Set(perAppVersion?.perf.map(i => Object.keys(i.time)).flat())]
+  function getDefaultOSVersion(platform = appConf.platform, version = appConf.version) {
+    const perAppVersion = platformData(platform).filter((e: VersionType) => e.version == version)[0]
+    const osVersions = Array.from(new Set(perAppVersion?.perf.map((i: PerfType) => Object.keys(i.time)).flat()))
     return osVersions[0]
   }
 
-  function changePlatform(newPlatform) {
-    const defaultAppVersion = data.data[newPlatform].map(p => p.version )[0] ?? "no version"
-    console.log('app version' , defaultAppVersion)
-        
-    setAppConf(oldAppConf => ({
+  function changePlatform(newPlatform: string) {
+    const defaultAppVersion = platformData(newPlatform).map(p => p.version)[0] ?? "no version"
+    console.log('app version', defaultAppVersion)
+
+    setAppConf((oldAppConf: AppConfType) => ({
       ...oldAppConf,
       platform: newPlatform,
       version: defaultAppVersion,
-      platformVersion: getDefaultOSVersion(newPlatform, defaultAppVersion)      
+      platformVersion: getDefaultOSVersion(newPlatform, defaultAppVersion)
     }));
   }
 
-  function changeVersion(newVersion) {
-    setAppConf(oldAppConf => ({
+  function changeVersion(newVersion: string) {
+    setAppConf((oldAppConf: AppConfType) => ({
       ...oldAppConf,
       version: newVersion,
       platformVersion: getDefaultOSVersion(appConf.platform, newVersion)
     }));
   }
 
-  function changePlatformVersion(newVersion) {
-    setAppConf(oldAppConf => ({
+  function changePlatformVersion(newVersion: string) {
+    setAppConf((oldAppConf: AppConfType) => ({
       ...oldAppConf,
       platformVersion: newVersion
     }));
@@ -75,75 +82,76 @@ export default function Home({ data }) {
         <Flex justifyContent="justify-start"
           alignItems="items-start"
           spaceX='space-x-2'>
-            <Title>Apps Dashboard</Title><Badge color="slate" text="Demo experience" size="xs" /></Flex>
+          <Title>Apps Dashboard</Title><Badge color="slate" text="Demo experience" size="xs" /></Flex>
         <Text>Analyse you application performance</Text>
-        <TabList defaultValue={"1Password"} handleSelect={(value) => {changeApp(value)}} marginTop="mt-6">
+        <TabList defaultValue={"1Password"} handleSelect={(value) => { changeApp(value) }} marginTop="mt-6">
           <Tab value="1Password" text="1Password" />
           <Tab value="Apollo" text="Apollo" />
         </TabList>
-        
+
 
         {appConf.app === "1Password" ?
-        
-        <Block>
-         
 
-        <Flex
-          justifyContent="justify-end"
-          alignItems="items-end"
-          spaceX="space-x-2"
-          truncate={false}
-          marginTop="mt-0"
-        >
-          <Toggle
-            defaultValue="apple"
-            handleSelect={(value) => changePlatform(value)}
-            color="blue"
-            marginTop="mt-0"
-          >
-            <ToggleItem
-              value="apple"
-              text=""
-              icon={FaApple}
-            />
-            <ToggleItem
-              value="android"
-              text=""
-              icon={FaAndroid}
-            />
-           
-          </Toggle>
-          <VersionChooser data={data} appConf={appConf} handleSelect={changeVersion}/>
+          <Block>
 
-        </Flex>
-        <ColGrid numColsMd={2} numColsLg={3} gapX="gap-x-6" gapY="gap-y-6" marginTop="mt-6">
-        <StartupCard data={data} appConf={appConf} platformVersionHandler={changePlatformVersion}/>
-        <SizeCard size={size}/>
-        <Reaper />
-      </ColGrid>
 
-      <Block marginTop="mt-6">
-        <Insights insights={data.insights}/>          
-      </Block>
-      </Block>
-      :
-      <Block marginTop="mt-6">
-        <Card><Title>No uploads for Apollo</Title>
-        <Footer height="h-16">
-      <Flex justifyContent="justify-end">
-        <Button text="Upload" size="xs" importance="secondary" handleClick={()=> alert("Hire me")}/>
-      </Flex>
-    </Footer>
-        </Card>        
-      </Block>
-      }
-        
+            <Flex
+              justifyContent="justify-end"
+              alignItems="items-end"
+              spaceX="space-x-2"
+              truncate={false}
+              marginTop="mt-0"
+            >
+              <Toggle
+                defaultValue="apple"
+                handleSelect={(value) => changePlatform(value)}
+                color="blue"
+                marginTop="mt-0"
+              >
+                <ToggleItem
+                  value="apple"
+                  text=""
+                  icon={FaApple}
+                />
+                <ToggleItem
+                  value="android"
+                  text=""
+                  icon={FaAndroid}
+                />
+
+              </Toggle>
+              <VersionChooser data={data} appConf={appConf} handleSelect={changeVersion} />
+
+            </Flex>
+            <ColGrid numColsMd={2} numColsLg={3} gapX="gap-x-6" gapY="gap-y-6" marginTop="mt-6">
+              <StartupCard data={data} appConf={appConf} platformVersionHandler={changePlatformVersion} />
+              <SizeCard size={size!} />
+              <Reaper />
+            </ColGrid>
+
+            <Block marginTop="mt-6">
+              <InsightsCard insights={data.insights} />
+            </Block>
+          </Block>
+          :
+          <Block marginTop="mt-6">
+            <Card><Title>No uploads for Apollo</Title>
+              <Footer height="h-16">
+                <Flex justifyContent="justify-end">
+                  <Button text="Upload" size="xs" importance="secondary" handleClick={() => alert("Hire me")} />
+                </Flex>
+              </Footer>
+            </Card>
+          </Block>
+        }
+
       </div>
       <p>This website is for training purposes only</p>
     </main>
   );
 }
 
+export default Home;
 
 export async function getStaticProps() {
   const res = await fetch('http://localhost:3000/api/appsize')

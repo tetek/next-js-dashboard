@@ -1,20 +1,16 @@
 import { Text, ButtonInline, Card, List, ListItem, Metric, Badge, Flex } from "@tremor/react";
 
-const cities = [
+const code = [
   {
-    city: "MyManager:getPrices",
-    rating: "2 open PR",
+    place: "MyManager:getPrices",
   },
   {
-    city: "MyManager:countItems",
-    rating: "1 open PR",
+    place: "MyManager:countItems",
   }
 ];
-
-export default function Reaper() {
-  return (
-    <Card>
-      <Flex justifyContent="justify-start" alignItems="items-start" spaceX='space-x-2'>
+const Reaper = () => (
+  <Card>
+    <Flex justifyContent="justify-start" alignItems="items-start" spaceX='space-x-2'>
       <Metric>Reaper</Metric>
 
       <Badge
@@ -23,17 +19,17 @@ export default function Reaper() {
         size="xs"
       />
     </Flex>
-      {/* <Metric>Reaper</Metric> */}
-      <Text>Dead code analysis</Text>
-      <List marginTop="mt-3">
-        {cities.map((item) => (
-          <ListItem key={item}>
-            <span>{item.city}</span>
-            <ButtonInline text="→" handleClick={() => alert("Hire me")}/>
-          </ListItem>
-        ))}
-      </List>
-    </Card>
-  )
-}
+    {/* <Metric>Reaper</Metric> */}
+    <Text>Dead code analysis</Text>
+    <List marginTop="mt-3">
+      {code.map((item) => (
+        <ListItem key={item.place}>
+          <span>{item.place}</span>
+          <ButtonInline text="→" handleClick={() => alert("Hire me")} />
+        </ListItem>
+      ))}
+    </List>
+  </Card>
+)
+export default Reaper;
 
