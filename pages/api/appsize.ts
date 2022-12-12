@@ -36,6 +36,23 @@ function getRandomSize() {
     },
 ];
 }
+const insights = () => [
+  {
+    insight: "Remove duplicate files",
+    detail: "Potencial savings 2MB",
+    gain: "+5%"
+  },
+  {
+    insight: "Minify localised strings",
+    detail: "Potential savings 1.1MB",
+    gain: "+2.69%"
+  },
+  {
+    insight: "Remove binary symbol metadata",
+    detail: "Potential savings 1.1MB",
+    gain: "+1.88%"
+  },  
+]
 
 export default function handler(
   req: NextApiRequest,
@@ -48,7 +65,7 @@ export default function handler(
           {model: "iPhone 14", time: {iOS15: 100, iOS16: 120}},
           {model: "iPad Pro", time: {iOS15: 200, iOS16: 190}}
         ],
-        version: "7.1.0",
+        version: "7.2.0",
         size: getRandomSize()
       },
       {
@@ -56,7 +73,7 @@ export default function handler(
           {model: "iPhone 14", time: {iOS15: 300, iOS16: 120}},
           {model: "iPad Pro", time: {iOS15: 500, iOS16: 90}}
         ],
-        version: "7.2.0",
+        version: "7.1.0",
         size: getRandomSize()
       }],          
       android: [{
@@ -64,7 +81,7 @@ export default function handler(
           {model: "Pixel 6", time: {Android10: 100, Android11: 120}},
           {model: "Samsung S8", time: {Android12: 500, Android11: 190}},          
         ],
-        version: "7.12.0",
+        version: "7.22.0",
         size: getRandomSize()
       },
       {
@@ -72,13 +89,14 @@ export default function handler(
           {model: "Pixel 11", time: {Android11: 100, Android12: 120}},
           {model: "Samsung S9", time: {Android11: 500, Android12: 190}}
         ],
-        version: "7.22.0",
+        version: "7.12.0",
         size: getRandomSize()
       }],
     },    
     app: "1Password",
     metric: "Startup time",
-    timeLimit: 1000
+    timeLimit: 1000,
+    insights: insights()
   }
   res.status(200).json(appPerformance)
 }

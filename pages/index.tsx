@@ -5,7 +5,7 @@ import {
   Tab,
   TabList,
   ColGrid,
-  Block, Subtitle, Toggle, ToggleItem, Badge
+  Block, Subtitle, Toggle, ToggleItem, Badge, Footer, Button
 } from '@tremor/react';
 
 import { useState } from 'react';
@@ -21,13 +21,12 @@ import { FaApple, FaAndroid } from "react-icons/fa"
 import { version } from 'os';
 import Reaper from '../comps/Reaper';
 import Insights from '../comps/Insights';
+import { compareVersions } from 'compare-versions';
 
 export default function Home({ data }) {
-  const [appConf, setAppConf] = useState({app: '1Password', platform: 'apple', version: '7.1.0', platformVersion: "iOS15"})
-
+  const [appConf, setAppConf] = useState({app: '1Password', platform: 'apple', version: '7.2.0', platformVersion: "iOS15"})
+  console.log(data.insights)
   const size = data.data[appConf.platform].find(i => i.version == appConf.version).size
-  
-//  const size = []
 
   function changeApp(newApp) {
     const defaultAppVersion = data.data[appConf.platform].map(p => p.version )[0] ?? "no version"
@@ -78,11 +77,16 @@ export default function Home({ data }) {
           spaceX='space-x-2'>
             <Title>Apps Dashboard</Title><Badge color="slate" text="Demo experience" size="xs" /></Flex>
         <Text>Analyse you application performance</Text>
-
         <TabList defaultValue={"1Password"} handleSelect={(value) => {changeApp(value)}} marginTop="mt-6">
           <Tab value="1Password" text="1Password" />
           <Tab value="Apollo" text="Apollo" />
         </TabList>
+        
+
+        {appConf.app === "1Password" ?
+        
+        <Block>
+         
 
         <Flex
           justifyContent="justify-end"
@@ -112,19 +116,30 @@ export default function Home({ data }) {
           <VersionChooser data={data} appConf={appConf} handleSelect={changeVersion}/>
 
         </Flex>
-
-
         <ColGrid numColsMd={2} numColsLg={3} gapX="gap-x-6" gapY="gap-y-6" marginTop="mt-6">
+        <StartupCard data={data} appConf={appConf} platformVersionHandler={changePlatformVersion}/>
+        <SizeCard size={size}/>
+        <Reaper />
+      </ColGrid>
 
-          <StartupCard data={data} appConf={appConf} platformVersionHandler={changePlatformVersion}/>
-          <SizeCard size={size}/>
-          <Reaper />
-        </ColGrid>
-
-        <Block marginTop="mt-6">
-          <Insights />          
-        </Block>
+      <Block marginTop="mt-6">
+        <Insights insights={data.insights}/>          
+      </Block>
+      </Block>
+      :
+      <Block marginTop="mt-6">
+        <Card><Title>No uploads for Apollo</Title>
+        <Footer height="h-16">
+      <Flex justifyContent="justify-end">
+        <Button text="Upload" size="xs" importance="secondary" handleClick={()=> alert("Hire me")}/>
+      </Flex>
+    </Footer>
+        </Card>        
+      </Block>
+      }
+        
       </div>
+      <p>This website is for training purposes only</p>
     </main>
   );
 }

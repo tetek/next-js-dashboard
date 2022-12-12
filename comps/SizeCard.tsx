@@ -9,12 +9,12 @@ const valueFormatter = (number: number) => (
 
 <Flex justifyContent="justify-between" alignItems="items-center">
 <Metric>App Size</Metric>
-        <BadgeDelta
+        {/* <BadgeDelta
         deltaType="moderateIncrease"
         text="+12.3%"
         isIncreasePositive={true}
         size="xs"
-      />
+      /> */}
     </Flex>
         
         <DonutChart
