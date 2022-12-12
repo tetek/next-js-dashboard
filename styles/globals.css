@@ -21,6 +21,18 @@ a {
   }
   body {
     color: white;
-    background: black;
+    background: #1f1f1f;
   }
+}
+main {
+  margin: 50pt;
+}
+img {
+  margin-bottom: 20pt;
+}
+.container {
+  
+  background-color: rgb(229, 231, 235);
+  padding: 20pt;
+  border-radius: 10pt;
 }
