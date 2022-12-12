@@ -22,17 +22,24 @@ a {
   body {
     color: white;
     background: #1f1f1f;
+    /* background-color: white; */
+    background-color: rgb(6, 11, 80);
   }
 }
 main {
   margin: 50pt;
 }
 img {
-  margin-bottom: 20pt;
+  margin-bottom: 20pt;  
 }
 .container {
   
   background-color: rgb(229, 231, 235);
   padding: 20pt;
   border-radius: 10pt;
+}
+
+.insightDesc {
+  width: 500pt;
+  white-space: pre-wrap;
 }

@@ -5,12 +5,13 @@ import {
   Tab,
   TabList,
   ColGrid,
-  Block, Subtitle, Toggle, ToggleItem
+  Block, Subtitle, Toggle, ToggleItem, Badge
 } from '@tremor/react';
 
 import { useState } from 'react';
 import StartupCard from '../comps/StartupCard';
 import VersionChooser from '../comps/VersionChooser';
+import SizeCard from '../comps/SizeCard';
 import Image from 'next/image';
 import { Flex } from "@tremor/react";
 import { MapIcon } from "@heroicons/react/24/solid";
@@ -18,30 +19,64 @@ import { Icon } from "@tremor/react";
 
 import { FaApple, FaAndroid } from "react-icons/fa"
 import { version } from 'os';
+import Reaper from '../comps/Reaper';
+import Insights from '../comps/Insights';
 
 export default function Home({ data }) {
-  const [selectedApp, setSelectedApp] = useState("1Password");
-  const [platform, setPlatform] = useState("apple");
-  const [version, setVersion] = useState("7.1.0");
-  const appConf = useState({app: '1Password', platform: 'apple', version: '7.1.0'})
-  const getPerf = () => { data.data[platform].filter(e => e.version == version)[0].perf }
-  console.log(data.data[platform].filter(e => e.version == version)[0])
+  const [appConf, setAppConf] = useState({app: '1Password', platform: 'apple', version: '7.1.0', platformVersion: "iOS15"})
 
-  function changeApp(value) {
-    setSelectedApp(value)
-    this.forceUpdate()
+  const size = data.data[appConf.platform].find(i => i.version == appConf.version).size
+  
+//  const size = []
+
+  function changeApp(newApp) {
+    const defaultAppVersion = data.data[appConf.platform].map(p => p.version )[0] ?? "no version"
+    setAppConf(oldAppConf => ({
+      ...oldAppConf,
+      app: newApp,
+      version: defaultAppVersion
+    }));
+  }
+  function getDefaultOSVersion(platform = appConf.platform, version= appConf.version) {
+    const perAppVersion = data.data[platform].filter(e => e.version == version)[0]
+    const osVersions = [...new Set(perAppVersion?.perf.map(i => Object.keys(i.time)).flat())]
+    return osVersions[0]
   }
 
-  function changeOS(value) {
-    setPlatform(value)
-    setVersion()
+  function changePlatform(newPlatform) {
+    const defaultAppVersion = data.data[newPlatform].map(p => p.version )[0] ?? "no version"
+    console.log('app version' , defaultAppVersion)
+        
+    setAppConf(oldAppConf => ({
+      ...oldAppConf,
+      platform: newPlatform,
+      version: defaultAppVersion,
+      platformVersion: getDefaultOSVersion(newPlatform, defaultAppVersion)      
+    }));
+  }
+
+  function changeVersion(newVersion) {
+    setAppConf(oldAppConf => ({
+      ...oldAppConf,
+      version: newVersion,
+      platformVersion: getDefaultOSVersion(appConf.platform, newVersion)
+    }));
+  }
+
+  function changePlatformVersion(newVersion) {
+    setAppConf(oldAppConf => ({
+      ...oldAppConf,
+      platformVersion: newVersion
+    }));
   }
   return (
     <main>
       <Image src="https://emergetools.com/images/emergetoolsstandard.png" alt="logo" width="80" height="48" />
-
       <div className="container">
-        <Title>My Apps</Title>
+        <Flex justifyContent="justify-start"
+          alignItems="items-start"
+          spaceX='space-x-2'>
+            <Title>Apps Dashboard</Title><Badge color="slate" text="Demo experience" size="xs" /></Flex>
         <Text>Analyse you application performance</Text>
 
         <TabList defaultValue={"1Password"} handleSelect={(value) => {changeApp(value)}} marginTop="mt-6">
@@ -58,7 +93,7 @@ export default function Home({ data }) {
         >
           <Toggle
             defaultValue="apple"
-            handleSelect={(value) => setPlatform(value)}
+            handleSelect={(value) => changePlatform(value)}
             color="blue"
             marginTop="mt-0"
           >
@@ -74,31 +109,21 @@ export default function Home({ data }) {
             />
            
           </Toggle>
-          <VersionChooser data={data} platform={platform} version={version} handleSelect={(value) => setVersion(value)}/>
+          <VersionChooser data={data} appConf={appConf} handleSelect={changeVersion}/>
 
         </Flex>
 
 
         <ColGrid numColsMd={2} numColsLg={3} gapX="gap-x-6" gapY="gap-y-6" marginTop="mt-6">
 
-          <StartupCard data={data} platform={platform} version={version} />
-          <Card>
-            { /* Placeholder to set height */}
-            <div className="h-28" />
-          </Card>
-          <Card>
-            { /* Placeholder to set height */}
-            <div className="h-28" />
-          </Card>
+          <StartupCard data={data} appConf={appConf} platformVersionHandler={changePlatformVersion}/>
+          <SizeCard size={size}/>
+          <Reaper />
         </ColGrid>
 
         <Block marginTop="mt-6">
-          <Card>
-            <div className="h-80" />
-          </Card>
+          <Insights />          
         </Block>
-
-
       </div>
     </main>
   );
@@ -108,7 +133,6 @@ export default function Home({ data }) {
 export async function getStaticProps() {
   const res = await fetch('http://localhost:3000/api/appsize')
   const data = await res.json()
-  console.log(data)
   return {
     props: { data }, // will be passed to the page component as props
   }

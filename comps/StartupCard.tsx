@@ -1,31 +1,33 @@
 
 import '@tremor/react/dist/esm/tremor.css';
-import { Card, Text, Metric, List, ListItem, Block, ProgressBar, ColGrid, CategoryBar, TabList, Tab } from '@tremor/react'
-import { useState } from "react";
+import { Card, Text, Metric, List, ListItem, Block, ProgressBar, ColGrid, CategoryBar, TabList, Tab, Legend } from '@tremor/react'
+import { useEffect, useRef, useState } from "react";
 
-function StartupCard({ data, platform, version }) {
+function StartupCard({ data, appConf, platformVersionHandler }) {
 
-  const perAppVersion = () => data.data[platform].filter(e => e.version == version)[0]
-  const getOSVersions = () => [...new Set(perAppVersion()?.perf.map(i => Object.keys(i.time)).flat())]
-  console.log(getOSVersions()[0])
-  const [systemVersion, setSystemVersion] = useState(getOSVersions()[0]);
-  console.log(systemVersion)
+  const perAppVersion = data.data[appConf.platform].filter(e => e.version == appConf.version)[0]
+  const osVersions = [...new Set(perAppVersion?.perf.map(i => Object.keys(i.time)).flat())]
+
+  const toDisplay = perAppVersion?.perf.filter(i => i.time[appConf.platformVersion] != null)
+
+  console.log(appConf)
   return (
-    <Card key={data.app}>
+    <Card key={data.platform}>
       <Metric>{data.metric}</Metric>
       <TabList
-        defaultValue={getOSVersions()[0]}
-        handleSelect={(value) => {setSystemVersion(value); console.log(value)}}
+        key={appConf.version}
+        defaultValue={appConf.platformVersion}
+        handleSelect={platformVersionHandler}
         marginTop="mt-6"
       >
-        {getOSVersions().map(osVersion => (
+        {osVersions.map(osVersion => (
           <Tab key={osVersion} value={osVersion} text={osVersion} />
         ))}
       </TabList>
 
       <List marginTop="mt-4">
-        {perAppVersion()?.perf.map((item) => (
-          <ListItem key={item.model}>
+        {toDisplay.map((item) => (          
+          <ListItem key={item.model}>            
             <Block>
               <Text>
                 {item.model}
@@ -33,15 +35,20 @@ function StartupCard({ data, platform, version }) {
               <CategoryBar
                 categoryPercentageValues={[100, 300, 300, 300]}
                 colors={["green", "emerald", "orange", "rose"]}
-                percentageValue={item.time[systemVersion] / data.timeLimit * 100.0}
+                percentageValue={item.time[appConf.platformVersion] / data.timeLimit * 100.0}
                 showLabels={true}
-                tooltip={`${item.time[systemVersion]}ms`}
+                tooltip={`${item.time[appConf.platformVersion]}ms`}
                 showAnimation={true}
                 marginTop="mt-0"
               />
             </Block>
           </ListItem>
         ))}
+        <Legend
+        categories={["Time in miliseconds"]}
+        colors={["emerald"]}
+        marginTop="mt-3"
+      />
       </List>
     </Card>
   )
