@@ -10,7 +10,6 @@ function StartupCard({ data, appConf, platformVersionHandler }: StartupCardType)
   const osVersions = Array.from(new Set(perAppVersion?.perf.map((i: PerfType) => Object.keys(i.time)).flat())) as Array<string>
   const toDisplay = perAppVersion?.perf.filter((i: PerfType) => i.time[appConf.platformVersion] != null) as Array<PerfType>
 
-  console.log(appConf)
   return (
     <Card key={data.metric}>
       <Metric>{data.metric}</Metric>

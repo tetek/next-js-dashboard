@@ -14,21 +14,15 @@ import VersionChooser from '../comps/VersionChooser';
 import SizeCard from '../comps/SizeCard';
 import Image from 'next/image';
 import { Flex } from "@tremor/react";
-import { MapIcon } from "@heroicons/react/24/solid";
-import { Icon } from "@tremor/react";
-
 import { FaApple, FaAndroid } from "react-icons/fa"
-import { version } from 'os';
 import Reaper from '../comps/Reaper';
 import InsightsCard from '../comps/InsightsCard';
-import { compareVersions } from 'compare-versions';
 import { HomeType, PerfType, VersionType, AppConfType } from '../interfaces';
+import appPerformance from '../data/appInfo'
 
 const Home = ({ data }: HomeType) => {
-  console.log('ddddd')
-  console.log(data)
   const [appConf, setAppConf]: [AppConfType, any] = useState({ app: '1Password', platform: 'apple', version: '7.2.0', platformVersion: "iOS15" })
-  console.log(data.insights)
+
   const platformData = (platform: string): Array<VersionType> => (data.data as any)[platform]
 
 
@@ -51,7 +45,6 @@ const Home = ({ data }: HomeType) => {
 
   function changePlatform(newPlatform: string) {
     const defaultAppVersion = platformData(newPlatform).map(p => p.version)[0] ?? "no version"
-    console.log('app version', defaultAppVersion)
 
     setAppConf((oldAppConf: AppConfType) => ({
       ...oldAppConf,
@@ -154,9 +147,7 @@ const Home = ({ data }: HomeType) => {
 export default Home;
 
 export async function getStaticProps() {
-  const res = await fetch('http://localhost:3000/api/appsize')
-  const data = await res.json()
   return {
-    props: { data }, // will be passed to the page component as props
+    props: { data: appPerformance },
   }
 }

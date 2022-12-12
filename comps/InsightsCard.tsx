@@ -3,7 +3,6 @@ import { Card, Callout, List, ListItem, Title, Metric, Subtitle, Block, Text, Fl
 import { InsightCardType } from "../interfaces";
 
 const InsightsCard = ({ insights }: InsightCardType) => {
-  console.log(insights)
   return (
     <Card>
       <Metric>Insights</Metric>
